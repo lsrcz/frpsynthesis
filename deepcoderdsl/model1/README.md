@@ -1,0 +1,6 @@
+- Inputs are lists
+- Discrete time reduction
+- Values are integers
+- Sketches use lists/integer indexes
+- Stateful operators are included (vs. stateful operators can only be used in certain positions)
+- Higher-order functions are chosen by index (vs. higher-order functions embedded in operators)

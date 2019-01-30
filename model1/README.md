@@ -1,5 +1,0 @@
-- Inputs are lists
-- Discrete time reduction
-- Values are integers
-- Sketches use lists/integer indexes
-- Stateful operators are included
