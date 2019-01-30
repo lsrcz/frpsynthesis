@@ -54,8 +54,8 @@
 
 (define take-dc-op
   (operator "take-dc"
-            (λ (insn past-vars) (take-dc (get-integer-arg insn) (get-input-stream insn past-vars)))
-            (λ (insn past-vars) (format "~a ~a" (get-integer-arg insn) (get-input-stream insn past-vars)))))
+            (λ (insn past-vars) (take-dc (get-input-stream insn past-vars) (get-input-stream2 insn past-vars)))
+            (λ (insn past-vars) (format "~a ~a" (get-input-stream insn past-vars) (get-input-stream2 insn past-vars)))))
 
 ;; drop
 
@@ -68,8 +68,8 @@
 
 (define drop-dc-op
   (operator "drop-dc"
-            (λ (insn past-vars) (drop-dc (get-integer-arg insn) (get-input-stream insn past-vars)))
-            (λ (insn past-vars) (format "~a ~a" (get-integer-arg insn) (get-input-stream insn past-vars)))))
+            (λ (insn past-vars) (drop-dc (get-input-stream insn past-vars) (get-input-stream2 insn past-vars)))
+            (λ (insn past-vars) (format "~a ~a" (get-input-stream insn past-vars) (get-input-stream2 insn past-vars)))))
 
 ;; access
 
@@ -81,8 +81,8 @@
 
 (define access-dc-op
   (operator "access-dc"
-            (λ (insn past-vars) (access-dc (get-integer-arg insn) (get-input-stream insn past-vars)))
-            (λ (insn past-vars) (format "~a ~a" (get-integer-arg insn) (get-input-stream insn past-vars)))))
+            (λ (insn past-vars) (access-dc (get-input-stream insn past-vars) (get-input-stream2 insn past-vars)))
+            (λ (insn past-vars) (format "~a ~a" (get-input-stream insn past-vars) (get-input-stream2 insn past-vars)))))
 
 ;; minimum
 
@@ -203,46 +203,46 @@
 (define int-to-int-funcs (list (λ (i) (+ i 1))
                                (λ (i) (- i 1))
                                (λ (i) (+ i i))
-                               (λ (i) (quotient i 2))
-                               (λ (i) (* i -1))
-                               (λ (i) (expt i 2))
+                             ;;  (λ (i) (quotient i 2))
+                             ;;  (λ (i) (* i -1))
+                            ;;   (λ (i) (expt i 2))
                                (λ (i) (+ i i i))
-                               (λ (i) (quotient i 3))
+                            ;;   (λ (i) (quotient i 3))
                                (λ (i) (+ i i i i))
-                               (λ (i) (quotient i 4))
+                            ;;   (λ (i) (quotient i 4))
                                ))
 (define int-to-int-funcs-string (list "(λ (i) (+ i 1))"
                                       "(λ (i) (- i 1))"
                                       "(λ (i) (+ i i))"
-                                      "(λ (i) (quotient i 2))"
-                                      "(λ (i) (* i -1))"
-                                      "(λ (i) (expt i 2))"
+                                   ;;   "(λ (i) (quotient i 2))"
+                                   ;;   "(λ (i) (* i -1))"
+                                   ;;   "(λ (i) (expt i 2))"
                                       "(λ (i) (* i 3))"
-                                      "(λ (i) (quotient i 3))"
+                                   ;;   "(λ (i) (quotient i 3))"
                                       "(λ (i) (* i 4))"
-                                      "(λ (i) (quotient i 4))"
+                                   ;;   "(λ (i) (quotient i 4))"
                                       ))
 
 (define int-to-bool-funcs (list (λ (i) (< i 0))
                                 (λ (i) (> i 0))
-                                (λ (i) (equal? 0 (modulo i 2)))
-                                (λ (i) (equal? 1 (modulo i 2)))
+                               ;; (λ (i) (equal? 0 (modulo i 2)))
+                              ;; (λ (i) (equal? 1 (modulo i 2)))
                                 ))
 (define int-to-bool-funcs-string (list "(λ (i) (negative? i))"
                                        "(λ (i) (positive? i))"
-                                       "(λ (i) (even? i))"
-                                       "(λ (i) (odd? i))"
+                                     ;;  "(λ (i) (even? i))"
+                                    ;;   "(λ (i) (odd? i))"
                                        ))
 
 (define int-to-int-to-int-funcs (list +
                                       -
-                                      *
+                                    ;;  *
                                       min
                                       max
                                       ))
 (define int-to-int-to-int-funcs-string (list "+"
                                              "-"
-                                             "*"
+                                           ;;  "*"
                                              "min"
                                              "max"))
 
