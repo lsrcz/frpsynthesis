@@ -279,7 +279,7 @@
 ;; constantB
 
 (define (constantB const behaviorB)
-  (behavior const (constantB const (changes behaviorB))))
+  (behavior const (constantE const (changes behaviorB))))
 
 (define constantB-imm-op
   (operator "constantB"
@@ -429,11 +429,11 @@
                                   ; "(λ (i) (* i ~a))"
                                    ))
 ;; int -> bool
-(define inttoboolfuncs (list (λ (placeholder p2 i) (<= i placeholder))
-                             (λ (placeholder p2 i) (>= i placeholder))
-                             (λ (placeholder p2 i) (< i placeholder))
-                             (λ (placeholder p2 i) (> i placeholder))
-                             (λ (placeholder p2 i) (= i placeholder))
+(define inttoboolfuncs (list (λ (placeholder i) (<= i placeholder))
+                             (λ (placeholder i) (>= i placeholder))
+                             (λ (placeholder i) (< i placeholder))
+                             (λ (placeholder i) (> i placeholder))
+                             (λ (placeholder i) (= i placeholder))
                              ))
 
 (define inttoboolfuncs-string (list "(λ (i) (<= i ~a))"

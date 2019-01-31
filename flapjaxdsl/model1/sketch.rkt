@@ -1,7 +1,7 @@
 #lang rosette
 
 (require "model.rkt")
-(require "fj-operators.rkt")
+(require "operators.rkt")
 
 (provide (all-defined-out))
 
