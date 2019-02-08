@@ -16,6 +16,14 @@
 
 ;; zeroE
 
+(define (zeroE evt-stream)
+  (map (λ (e) NOEVENT) evt-stream))
+
+(define zeroE-op
+  (operator "zeroE"
+            (λ (insn past-vars) (zeroE (get-integer-arg insn)))
+            (λ (insn past-vars) "")))
+
 ;; mapE
 
 (define (mapE proc evt-stream)
@@ -245,6 +253,8 @@
 
 ;; timerE
 
+
+
 ;;;;;;;;;;;;;;;;;;; behavior operators ;;;;;;;;;;;;;;;;;
 
 ;; startsWith
@@ -465,7 +475,7 @@
 
 (define operator-list
   (list ;; oneE-op
-   ;; zeroE-op
+   zeroE-op
    mapE-op
    mergeE-op
    ;; switchE-op
