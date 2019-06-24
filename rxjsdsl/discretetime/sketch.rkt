@@ -65,7 +65,34 @@
                    "\n"
                    return-stmt)))
 
+(define (string-from-sketch-rx sk funcname)
+  (let* ([input-count (sketch-input-count sk)]
+         [arg-list (for/list ([i (range input-count)])
+                     (format "input~a" (add1 i)))]
+         [input-stmt-list (for/list ([i (range input-count)])
+                            (format "  var r~a = input~a;" (add1 i) (add1 i)))]
+         [insn-count (length (sketch-insns sk))]
+         [varlist (for/list ([i (range (+ input-count insn-count))])
+                    (format "r~a" (add1 i)))]
+         [stmt-list (for/list ([i (range insn-count)])
+                      (print-insn-rx (operator-lookup sk i)
+                                  (list-ref (sketch-insns sk) i)
+                                  (list-ref varlist (+ input-count i))
+                                  (take varlist (+ input-count i))))]
+         [return-stmt (format "  return ~a;" (list-ref varlist (sketch-retval-idx sk)))])
+    (string-append (format "function ~a(~a) {\n" funcname (string-join arg-list ", "))
+                   (string-join input-stmt-list "\n")
+                   "\n"
+                   (string-join stmt-list "\n")
+                   "\n"
+                   return-stmt
+                   "\n"
+                   "}")))
+
 ;; pretty-print a symbolic sketch with model from solver
 
 (define (print-sketch sk binding [funcname "synthesized-function"])
   (displayln (string-from-sketch (evaluate sk binding) funcname)))
+
+(define (print-sketch-rx sk binding [funcname "synthesized-function"])
+  (displayln (string-from-sketch-rx (evaluate sk binding) funcname)))

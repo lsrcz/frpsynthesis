@@ -21,4 +21,6 @@
 
 (if (unsat? b)
     (println "Synthesis from reference function: unsat")
-    (print-sketch sym-sk b))
+    (begin
+      (print-sketch sym-sk b)
+      (print-sketch-rx sym-sk b)))
