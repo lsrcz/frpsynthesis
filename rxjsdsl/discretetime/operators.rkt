@@ -24,13 +24,13 @@
   (format "  var ~a = ~a;" varname ((operator-printrx op) insn past-vars)))
 
 ;; a list of higher-order int->int functions
-(define int-functions (list add1 sub1 (λ (i) 1) (λ (i) -1)))
-(define int-functions-str (list "add1" "sub1" "(λ (i) 1)" "(λ (i) -1)"))
-(define int-functions-str-rx (list "e => e + 1" "e => e - 1" "e => 1" "e => -1"))
+(define unary-functions (list add1 sub1 (λ (i) 1) (λ (i) -1) (λ (i) #f) cadr))
+(define unary-functions-str (list "add1" "sub1" "(λ (i) 1)" "(λ (i) -1)" "(λ (i) #f)" "cadr"))
+(define unary-functions-str-rx (list "e => e + 1" "e => e - 1" "e => 1" "e => -1" "e => false" "lst => lst[1]"))
 ;; higher-order int->int->int functions
-(define int-int-functions (list + -))
-(define int-int-functions-str (list "+" "-"))
-(define int-int-functions-str-rx (list "(l, r) => l + r" "(l, r) => l - r"))
+(define binary-functions (list + -))
+(define binary-functions-str (list "+" "-"))
+(define binary-functions-str-rx (list "(l, r) => l + r" "(l, r) => l - r"))
 
 (define (print-operator-rx name func-list)
   (λ (reg-insn past-vars)
@@ -40,14 +40,18 @@
   (λ (reg-insn past-vars)
     (format "~a(~a, ~a)" name (get-input-stream1 reg-insn past-vars) (get-input-stream2 reg-insn past-vars))))
 
+(define (print-operator-stream-rx name)
+  (λ (reg-insn past-vars)
+    (format "~a.pipe(~a(~a))" (get-input-stream1 reg-insn past-vars) name (get-input-stream2 reg-insn past-vars))))
+
 (define rxMap-op
   (operator "rxMap"
-            (λ (reg-insn past-vars) (rxMap (get-argfunc reg-insn int-functions)
+            (λ (reg-insn past-vars) (rxMap (get-argfunc reg-insn unary-functions)
                                            (get-input-stream1 reg-insn past-vars)))
             (λ (reg-insn past-vars) (format "~a ~a"
-                                            (get-argfunc reg-insn int-functions-str)
+                                            (get-argfunc reg-insn unary-functions-str)
                                            (get-input-stream1 reg-insn past-vars)))
-            (print-operator-rx "map" int-functions-str-rx)
+            (print-operator-rx "map" unary-functions-str-rx)
             ))
 
 (define rxMerge-op
@@ -61,15 +65,35 @@
 
 (define rxScan-op
   (operator "rxScan"
-            (λ (reg-insn past-vars) (rxScan (get-argfunc reg-insn int-int-functions)
+            (λ (reg-insn past-vars) (rxScan (get-argfunc reg-insn binary-functions)
                                             (get-input-stream1 reg-insn past-vars)))
             (λ (reg-insn past-vars) (format "~a ~a"
-                                            (get-argfunc reg-insn int-int-functions)
+                                            (get-argfunc reg-insn binary-functions)
                                             (get-input-stream1 reg-insn past-vars)))
-            (print-operator-rx "scan" int-int-functions-str-rx)))
+            (print-operator-rx "scan" binary-functions-str-rx)))
 
-(define operator-list (list rxMap-op rxMerge-op rxScan-op))
+(define rxWithLatestFrom-op
+  (operator "rxWithLatestFrom"
+            (λ (reg-insn past-vars) (rxWithLatestFrom (get-input-stream1 reg-insn past-vars)
+                                                      (get-input-stream2 reg-insn past-vars)))
+            (λ (reg-insn past-vars) (format "~a ~a"
+                                            (get-input-stream1 reg-insn past-vars)
+                                            (get-input-stream2 reg-insn past-vars)))
+            (print-operator-stream-rx "withLatestFrom")))
+
+(define rxFilter-op
+  (operator "rxFilter"
+            (λ (reg-insn past-vars) (rxFilter (get-argfunc reg-insn unary-functions)
+                                              (get-input-stream1 reg-insn past-vars)))
+            (λ (reg-insn past-vars) (format "~a ~a"
+                                            (get-argfunc reg-insn unary-functions)
+                                            (get-input-stream1 reg-insn past-vars)))
+            (print-operator-rx "filter" unary-functions-str-rx)))
+
+(define operator-list (list rxMap-op rxMerge-op rxScan-op rxWithLatestFrom-op rxFilter-op))
 (define operator-id-lookup (make-hash (list (cons "rxMap" 0)
                                             (cons "rxMerge" 1)
-                                            (cons "rxScan" 2))))
+                                            (cons "rxScan" 2)
+                                            (cons "rxWithLatestFrom" 3)
+                                            (cons "rxFilter" 4))))
 

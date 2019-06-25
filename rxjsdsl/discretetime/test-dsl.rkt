@@ -14,3 +14,10 @@
 (check-equal? (rxScan + '()) '())
 (check-equal? (rxScan + (list NOEVENT 1)) (list NOEVENT 1))
 (check-equal? (rxScan + (list NOEVENT 1 NOEVENT 1 NOEVENT 2)) (list NOEVENT 1 NOEVENT 2 NOEVENT 4))
+
+(check-equal? (rxWithLatestFrom
+               (list NOEVENT 1 NOEVENT 2 NOEVENT 3)
+               (list NOEVENT NOEVENT 4 NOEVENT 5 NOEVENT))
+              (list NOEVENT NOEVENT NOEVENT (list 2 4) NOEVENT (list 3 5)))
+
+(check-equal? (rxFilter (lambda (x) (> x 1)) (list NOEVENT 0 1 2)) (list NOEVENT NOEVENT NOEVENT 2))

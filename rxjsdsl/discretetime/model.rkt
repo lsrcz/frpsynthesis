@@ -1,5 +1,7 @@
 #lang rosette
 
+(require rosette/lib/angelic)
+
 (provide (all-defined-out))
 
 ;; convenience methods for getting symbolic vars
@@ -10,6 +12,14 @@
 (define (get-sym-int)
   (define-symbolic* i integer?)
   i)
+(define (get-sym-any)
+  (define-symbolic* b boolean?)
+  (define-symbolic* i integer?)
+  (choose* b i))
+(define (get-sym-list constructor len)
+  (if (= len 0)
+      '()
+      (cons (constructor) (get-sym-list constructor (- len 1)))))
 
 ;; In the discrete time model, a stream is represented by a list.
 ;; Each element in the list represents a tick of the clock.
