@@ -94,5 +94,5 @@
 (define (print-sketch sk binding [funcname "synthesized-function"])
   (displayln (string-from-sketch (evaluate sk binding) funcname)))
 
-(define (print-sketch-rx sk binding [funcname "synthesized-function"])
+(define (print-sketch-rx sk binding [funcname "synthesized_function"])
   (displayln (string-from-sketch-rx (evaluate sk binding) funcname)))
