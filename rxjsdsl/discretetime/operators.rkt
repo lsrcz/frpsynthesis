@@ -68,7 +68,7 @@
             (λ (reg-insn past-vars) (rxScan (get-argfunc reg-insn binary-functions)
                                             (get-input-stream1 reg-insn past-vars)))
             (λ (reg-insn past-vars) (format "~a ~a"
-                                            (get-argfunc reg-insn binary-functions)
+                                            (get-argfunc reg-insn binary-functions-str)
                                             (get-input-stream1 reg-insn past-vars)))
             (print-operator-rx "scan" binary-functions-str-rx)))
 
@@ -86,7 +86,7 @@
             (λ (reg-insn past-vars) (rxFilter (get-argfunc reg-insn unary-functions)
                                               (get-input-stream1 reg-insn past-vars)))
             (λ (reg-insn past-vars) (format "~a ~a"
-                                            (get-argfunc reg-insn unary-functions)
+                                            (get-argfunc reg-insn unary-functions-str)
                                             (get-input-stream1 reg-insn past-vars)))
             (print-operator-rx "filter" unary-functions-str-rx)))
 
