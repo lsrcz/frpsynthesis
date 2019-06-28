@@ -25,7 +25,7 @@
     (if (not-empty-event? elt1) elt1 elt2)))
 
 ;; http://reactivex.io/documentation/operators/scan.html
-(define (rxScan f inputStream)
+(define (rxScan-orig f inputStream)
   (for/list ([idx (range (length inputStream))])
     (let ([evts (filter not-empty-event? (take inputStream (add1 idx)))])
       (if (empty-event? (list-ref inputStream idx))
@@ -34,19 +34,43 @@
               (list-ref inputStream idx)
               (foldl f (first evts) (cdr evts)))))))
 
+(define (rxScan f inputStream)
+  (define result car)
+  (define last cdr)
+  (define build cons)
+  (reverse
+   (result
+    (foldl (lambda (a acc)
+             (if (empty-event? a)
+                 (build (cons NOEVENT (result acc)) (last acc))
+                 (let ([newval
+                        (if (empty-event? (last acc))
+                            a
+                            (f (last acc) a))])
+                   (build
+                    (cons
+                     newval
+                     (result acc))
+                    newval))))
+             (build '() NOEVENT)
+             inputStream))))
+
 ;; https://rxjs.dev/api/operators/withLatestFrom
-;; result is a pair, car => final result, cdr last event in stream2
+;; acc is a pair, car => final result, cdr last event in stream2
 (define (rxWithLatestFrom stream1 stream2)
+  (define result car)
+  (define last cdr)
+  (define build cons)
   (reverse
    (car
-    (foldl (lambda (a b result)
+    (foldl (lambda (a b acc)
              (if (empty-event? a)
                  (if (empty-event? b)
-                     (cons (cons NOEVENT (car result)) (cdr result))
-                     (cons (cons NOEVENT (car result)) b))
-                 (if (empty-event? (cdr result))
-                     (cons (cons NOEVENT (car result)) NOEVENT)
-                     (cons (cons (list a (cdr result)) (car result)) (cdr result)))))
+                     (build (cons NOEVENT (result acc)) (last acc))
+                     (build (cons NOEVENT (result acc)) b))
+                 (if (empty-event? (last acc))
+                     (build (cons NOEVENT (result acc)) NOEVENT)
+                     (build (cons (list a (last acc)) (result acc)) (last acc)))))
            (cons '() NOEVENT)
            stream1
            stream2))))
