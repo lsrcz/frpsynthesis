@@ -18,6 +18,11 @@
 (check-equal? (rxMerge (list 0 NOEVENT 2 NOEVENT) (list NOEVENT 1 NOEVENT 3)) (list 0 1 2 3))
 (check-equal? (rxMerge (list NOEVENT 2 4) (list 1 3 NOEVENT)) (list 1 2 4))
 
+(check-equal? (rxPairwise (list 1 NOEVENT 3)) (list NOEVENT NOEVENT (cons 1 3)))
+(check-equal? (rxPairwise (list NOEVENT 2 NOEVENT)) (list NOEVENT NOEVENT NOEVENT))
+(check-equal? (rxPairwise (list NOEVENT NOEVENT 3)) (list NOEVENT NOEVENT NOEVENT))
+(check-equal? (rxPairwise (list NOEVENT 2 3)) (list NOEVENT NOEVENT (cons 2 3)))
+
 (check-equal? (rxScan + (list 0 1 2 3)) (list 0 1 3 6))
 (check-equal? (rxScan + '()) '())
 (check-equal? (rxScan + (list NOEVENT 1)) (list NOEVENT 1))

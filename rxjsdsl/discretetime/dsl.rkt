@@ -66,6 +66,17 @@
              [elt2 stream2])
     (if (not-empty-event? elt1) elt1 elt2)))
 
+;; http://reactivex.io/documentation/operators/buffer.html
+(define (rxPairwise inputStream)
+  (for/list ([i (range (length inputStream))])
+    (if (or (empty-event? (list-ref inputStream i))
+            (andmap empty-event? (take inputStream i)))
+        NOEVENT
+        (cons (foldl (λ (evt accum)
+                       (if (and (empty-event? accum) (not-empty-event? evt))
+                           evt
+                           accum)) NOEVENT (reverse (take inputStream i))) (list-ref inputStream i)))))
+
 ;; http://reactivex.io/documentation/operators/scan.html
 (define (rxScan f inputStream)
   (let ([accumStream (getStatefulStream (λ (evt accum)
