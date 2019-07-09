@@ -2,9 +2,9 @@
 
 (require rackunit)
 
-(require "instruction.rkt")
-(require "operators.rkt")
-(require "sketch.rkt")
+(require "../instruction.rkt")
+(require "../operators.rkt")
+(require "../sketch.rkt")
 
 ;; stream.map(add1).scan(+)
 (define sk1 (sketch (list (insn (hash-ref operator-id-lookup "rxMap") 0 9 0)

@@ -2,8 +2,8 @@
 
 (require rackunit)
 
-(require "model.rkt")
-(require "dsl.rkt")
+(require "../model.rkt")
+(require "../dsl.rkt")
 
 (check-equal? (rxCombineLatest + (list 1 NOEVENT 2 NOEVENT 4 NOEVENT NOEVENT)
                                  (list NOEVENT 1 NOEVENT NOEVENT NOEVENT 2 3))
