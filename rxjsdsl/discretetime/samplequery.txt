@@ -1,0 +1,1 @@
+{"bound":4,"input-count":1,"trace-list":[{"inputs":["-13-7"],"output":"-24-8"}],"insn-count":1}
