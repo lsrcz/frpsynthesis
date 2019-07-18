@@ -78,7 +78,7 @@
                            accum)) NOEVENT (reverse (take inputStream i))) (list-ref inputStream i)))))
 
 ;; http://reactivex.io/documentation/operators/scan.html
-(define (rxScan f inputStream)
+#|(define (rxScan f inputStream)
   (let ([accumStream (getStatefulStream (λ (evt accum)
                                 (if (empty-event? evt)
                                     accum
@@ -89,9 +89,36 @@
                [accum-event accumStream])
       (if (empty-event? input-event)
           NOEVENT
-          accum-event))))
+          accum-event))))|#
+
+(struct scan-pair (val acc) #:transparent)
+
+(define (rxScanHelper f inputStream start)
+  (define (combineTwo last-acc x)
+    (match last-acc
+      [(scan-pair v a)
+       (if (empty-event? a)
+           (if (empty-event? x)
+               (scan-pair NOEVENT NOEVENT)
+               (scan-pair x x))
+           (if (empty-event? x)
+               (scan-pair NOEVENT a)
+               (let ([newval (f a x)])
+                 (scan-pair newval newval))))]
+      ))
+  (cdr (map scan-pair-val
+            (reverse
+             (foldl
+              (lambda (x acc) (cons (combineTwo (car acc) x) acc))
+              (list (scan-pair start start))
+              inputStream)))))
+
+(define (rxScan f inputStream) (rxScanHelper f inputStream NOEVENT))
+
+(define (rxScanWithInit f inputStream init) (rxScanHelper f inputStream init))
 
 ;; http://reactivex.io/documentation/operators/skip.html
+
 (define (rxSkip n inputStream)
   (let ([eventCounter (getStatefulStream (λ (evt accum)
                                  (if (empty-event? evt)
@@ -136,3 +163,38 @@
            stream1
            stream2))))
 
+(define (sync-constant x inputStream)
+  (map (λ (y) x) inputStream))
+
+(define (sync-lessThan stream1 stream2)
+  (map < stream1 stream2))
+
+(define (sync-equalTo stream1 stream2)
+  (map = stream1 stream2))
+
+(define (sync-lessThanOrEqualTo stream1 stream2)
+  (map <= stream1 stream2))
+
+(define (sync-and stream1 stream2)
+  (map (lambda (x y) (and x y)) stream1 stream2))
+
+(define (sync-or stream1 stream2)
+  (map (lambda (x y) (or x y)) stream1 stream2))
+
+(define (sync-not stream1)
+  (map not stream1))
+
+(define (sync-if pred thenb elseb)
+  (map (lambda (p t e) (if p t e)) pred thenb elseb))
+
+(define (sync-add stream1 stream2)
+  (map + stream1 stream2))
+
+(define (sync-sub stream1 stream2)
+  (map - stream1 stream2))
+
+(define (sync-mul stream1 stream2)
+  (map * stream1 stream2))
+
+(define (sync-map2 f stream1 stream2)
+  (map f stream1 stream2))

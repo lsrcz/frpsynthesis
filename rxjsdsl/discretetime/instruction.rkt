@@ -19,7 +19,7 @@
 ;; the instruction would be {0 0 2}
 
 (struct insn
-  (op-idx input-idx1 input-idx2 argfunc-idx1) #:transparent)
+  (op-idx input-idx1 input-idx2 input-idx3 argfunc-idx1 constant) #:transparent)
 
 ;; helpers
 
@@ -32,8 +32,14 @@
 (define (get-input-stream2 insn streams)
   (list-ref streams (insn-input-idx2 insn)))
 
+(define (get-input-stream3 insn streams)
+  (list-ref streams (insn-input-idx3 insn)))
+
 (define (get-argfunc insn argfuncs)
   (list-ref argfuncs (insn-argfunc-idx1 insn)))
+
+(define (get-constant insn constants)
+  (list-ref constants (insn-constant insn)))
 
 ;; create symbolic instructions
 
@@ -41,8 +47,10 @@
   (define-symbolic* op-idx integer?)
   (define-symbolic* input-idx1 integer?)
   (define-symbolic* input-idx2 integer?)
+  (define-symbolic* input-idx3 integer?)
   (define-symbolic* argfunc-idx1 integer?)
-  (insn op-idx input-idx1 input-idx2 argfunc-idx1))
+  (define-symbolic* constant integer?)
+  (insn op-idx input-idx1 input-idx2 input-idx3 argfunc-idx1 constant))
 
 (define (make-sym-insn-list count)
   (for/list ([i (range count)])

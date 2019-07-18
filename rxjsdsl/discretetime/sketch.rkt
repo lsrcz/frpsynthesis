@@ -3,6 +3,7 @@
 (require "model.rkt")
 (require "instruction.rkt")
 (require "operators.rkt")
+(require "constraints.rkt")
 
 (provide (all-defined-out))
 
@@ -35,11 +36,42 @@
 (define (get-sketch-function sk)
   (letrec ([f (λ (calculated-streams i)
                 (cond [(equal? (length (sketch-insns sk)) i) calculated-streams]
-                      [else (let ([next-stream (call-insn (operator-lookup sk i)
-                                                          (list-ref (sketch-insns sk) i)
+                      [else (let ([next-stream (call-insn (list-ref (sketch-insns sk) i)
                                                           calculated-streams)])
                               (f (append calculated-streams (list next-stream)) (add1 i)))]))])
     (λ inputs (list-ref (f inputs 0) (sketch-retval-idx sk)))))
+
+;(struct processed-sketch (func constraint) #:transparent)
+
+(define (get-sketch-constraint sk)
+  (letrec ([f (lambda (calculated-streams generated-constraint insns)
+                (if (null? insns)
+                    ;(processed-sketch (list-ref calculated-streams (sketch-retval-idx sk))
+                                      generated-constraint;)
+                    (let* ([next-stream (call-insn (car insns)
+                                                   calculated-streams)]
+                           [next-constraint (constraint-insn (car insns)
+                                                             calculated-streams)])
+                      (f (append calculated-streams (list next-stream))
+                         (and generated-constraint next-constraint)
+                         (cdr insns)))
+                    ))])
+    (lambda inputs (=> (apply exactly-one-event inputs)
+                       (f inputs #t (sketch-insns sk))))))
+
+(define (get-type sk inputTys)
+  (letrec ([check (λ (calculated-types insns)
+                  (if (null? insns)
+                      (list-ref calculated-types (sketch-retval-idx sk))
+                      (let ([next-type (check-insn-type (car insns) calculated-types)])
+                        (if (eq? next-type 'bad)
+                            'bad
+                            (check (append calculated-types (list next-type)) (cdr insns))))))])
+    (check inputTys (sketch-insns sk))))
+
+(define (type-ok? sk inputTys outputTy)
+  (eq? (get-type sk inputTys) outputTy))
+
 
 ;; pretty-print a concrete sketch
 
